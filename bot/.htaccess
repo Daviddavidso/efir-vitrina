@@ -1,0 +1,6 @@
+# Снаружи доступны только вебхук и установщик
+Require all denied
+<FilesMatch "^(bot|install)\.php$">
+  Require all granted
+</FilesMatch>
+Options -Indexes

@@ -1,0 +1,291 @@
+/* Витрина финпредложений, версия 2: белый минимализм 2026, нейтральная (без привязки к каналу/бренду). Холодные нейтральные поверхности, один сигнальный цвет
+   на мелочах, 3D-веер карт в первом экране, каталог — белые карточки в цветах брендов на светлой полосе. */
+
+@font-face { font-family: "Geologica"; src: url(../fonts/Geologica.woff2) format("woff2"); font-weight: 100 900; font-display: swap; }
+@font-face { font-family: "Martian Mono"; src: url(../fonts/MartianMono.woff2) format("woff2"); font-weight: 100 800; font-stretch: 75% 112%; font-display: swap; }
+
+:root {
+  --bg: #FFFFFF;
+  --surface: #F4F5F7;
+  --surface-2: #ECEEF1;
+  --line: #E6E8EC;
+  --ink: #0B0D12;
+  --ink-2: #242833;
+  --muted: #5B6270;
+  --signal: #FF4A1C;
+  --radius: 26px;
+  --gutter: clamp(16px, 4vw, 40px);
+  --f: "Geologica", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "Martian Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --ease-out: cubic-bezier(.16, 1, .3, 1);
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+/* шапка и полоса фильтра липкие: якоря и фокус не должны уходить под них. --hdr/--flt — их реальная высота (js/app.js) */
+html { scroll-padding-top: calc(var(--hdr, 69px) + 12px); -webkit-text-size-adjust: 100%; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 1.0625rem/1.55 var(--f); -webkit-font-smoothing: antialiased; overflow-x: clip; }
+img { max-width: 100%; display: block; }
+a { color: inherit; text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2.5px solid var(--ink); outline-offset: 3px; }
+.vh { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.wrap { width: min(1200px, 100%); margin-inline: auto; padding-inline: var(--gutter); }
+.skip { position: absolute; left: 12px; top: -100px; z-index: 60; padding: 12px 16px; border-radius: 12px; background: var(--ink); color: #fff; font-weight: 600; text-decoration: none; }
+.skip:focus { top: 12px; }
+
+/* ---------- кнопки ---------- */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 52px; padding: 0 24px; border-radius: 999px; border: 0;
+  background: var(--ink); color: #fff; font: 600 1rem/1 var(--f); text-decoration: none; cursor: pointer; white-space: nowrap;
+  transition: transform .2s var(--ease-out), background-color .2s; }
+.btn:hover { background: var(--ink-2); }
+.btn:active { transform: scale(.98); }
+.btn svg { width: 18px; height: 18px; flex: none; }
+.btn--soft { background: var(--surface); color: var(--ink); }
+.btn--soft:hover { background: var(--surface-2); }
+.btn--sm { min-height: 44px; padding: 0 18px; font-size: .9375rem; }
+
+/* ---------- шапка ---------- */
+.hdr { position: sticky; top: 0; z-index: 30; background: rgba(255,255,255,.86); -webkit-backdrop-filter: saturate(1.6) blur(14px); backdrop-filter: saturate(1.6) blur(14px); border-bottom: 1px solid transparent; transition: border-color .2s; }
+.hdr.is-stuck { border-bottom-color: var(--line); }
+.hdr__in { display: flex; align-items: center; gap: 12px; min-height: 68px; }
+.logo { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; font: 800 1.35rem/1 var(--f); letter-spacing: -.04em; }
+.logo__mark { width: 34px; height: 34px; border-radius: 11px; background: var(--ink); display: grid; place-items: center; flex: none; }
+.logo__mark svg { width: 24px; height: 24px; }
+.hdr nav { margin-left: auto; }
+.hdr nav ul { display: flex; gap: 2px; list-style: none; margin: 0; padding: 0; }
+.hdr nav a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border-radius: 999px; text-decoration: none; font-weight: 500; font-size: .9375rem; color: var(--ink-2); }
+.hdr nav a:hover { background: var(--surface); }
+.hdr .btn { margin-left: 6px; }
+@media (max-width: 880px) { .hdr nav { display: none; } .hdr .btn { margin-left: auto; } }
+
+/* ---------- первый экран ---------- */
+.hero { padding-top: clamp(32px, 6vw, 72px); padding-bottom: clamp(16px, 3vw, 40px); }
+.hero__grid { display: grid; gap: clamp(8px, 3vw, 40px); align-items: center; }
+@media (min-width: 1000px) {
+  .hero__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); grid-template-areas: "head fan" "body fan"; align-items: end; }
+  .hero__head { grid-area: head; } .hero__body { grid-area: body; align-self: start; } .fan { grid-area: fan; align-self: center; }
+}
+.pill { display: inline-flex; align-items: center; gap: 10px; padding: 8px 14px 8px 12px; border-radius: 999px; background: var(--surface); font-size: .875rem; font-weight: 500; color: var(--ink-2); }
+.pill i { width: 8px; height: 8px; border-radius: 50%; background: #16A34A; flex: none; box-shadow: 0 0 0 4px rgba(22,163,74,.16); }
+.hero h1 { margin: 20px 0 0; font: 750 clamp(2.5rem, 5.4vw, 4.4rem)/.98 var(--f); letter-spacing: -.045em; text-wrap: balance; }
+.hero h1 span { color: var(--muted); }
+.hero__lead { margin: 0; max-width: 30em; font-size: clamp(1.0625rem, 1.4vw, 1.1875rem); color: var(--muted); text-wrap: pretty; }
+.hero__cta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 30px; }
+.hero__facts { display: flex; flex-wrap: wrap; gap: 8px 32px; margin: 36px 0 0; padding: 0; list-style: none; }
+.hero__facts b { display: block; font: 750 1.75rem/1 var(--f); letter-spacing: -.04em; }
+.hero__facts span { font-size: .875rem; color: var(--muted); }
+
+/* ---------- веер карт ----------
+   Весь веер — одна плоскость, наклонённая в 3D, поэтому карты не режут друг друга, а порядок слоёв задаёт z-index.
+   .bank — неподвижная зона под курсором, .bank__face — сама карта: при наведении поднимается только она,
+   и карта не «убегает» из-под курсора. Место карты в веере — data-slot (0…4); клик «вытаскивает» карту вперёд (js/app.js).
+   --p — насколько веер раскрыт (1 — полностью, 0 — одна карта): считается из прокрутки, вниз — сворачивается. */
+.fan { --k: 1; --p: 1; position: relative; height: clamp(250px, 36vw, 440px); perspective: 1600px; user-select: none; -webkit-user-select: none; }
+.fan__stage { position: absolute; inset: 0; transform: rotateX(var(--rx, 12deg)) rotateY(var(--ry, -8deg)); transition: transform .9s var(--ease-out); }
+.fan__floor { position: absolute; left: 14%; right: 14%; bottom: 6%; height: 40px; border-radius: 50%; background: radial-gradient(closest-side, rgba(15,23,42,.22), transparent); filter: blur(8px); opacity: 0; scale: .55 1; transition: opacity 1s .3s, scale .7s var(--ease-out); }
+.fan.is-open .fan__floor { opacity: 1; scale: calc(.55 + .45 * var(--p)) 1; }
+.bank { --w: clamp(160px, 20vw, 262px); --tx: 0px; --ty: 0px; --rot: 0deg; --z: 1;
+  position: absolute; left: 50%; bottom: 24%; width: var(--w); aspect-ratio: 1.586; margin-left: calc(var(--w) / -2);
+  transform-origin: 50% 140%;
+  transform: translate(var(--tx), var(--ty)) rotate(var(--rot));
+  z-index: var(--z);
+  transition: transform .75s var(--ease-out) var(--delay, 0ms), z-index 0s .25s;
+  cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+/* стопка: центральная сверху, остальные чуть выглядывают из-под неё */
+.bank[data-slot="0"] { --ty: 7px; --rot: -3deg; }
+.bank[data-slot="1"] { --ty: 3px; --rot: -1.5deg; --z: 3; }
+.bank[data-slot="2"] { --z: 5; }
+.bank[data-slot="3"] { --ty: 3px; --rot: 1.5deg; --z: 3; }
+.bank[data-slot="4"] { --ty: 7px; --rot: 3deg; }
+/* веер: пять мест слева направо; между стопкой и веером — пропорционально --p */
+.fan.is-open .bank[data-slot="0"] { --tx: calc(var(--w) * -.5 * var(--k) * var(--p)); --ty: calc(7px * (1 - var(--p)) + var(--w) * .1 * var(--k) * var(--p)); --rot: calc(-3deg * (1 - var(--p)) - 18deg * var(--k) * var(--p)); }
+.fan.is-open .bank[data-slot="1"] { --tx: calc(var(--w) * -.26 * var(--k) * var(--p)); --ty: calc(3px * (1 - var(--p)) + var(--w) * .025 * var(--k) * var(--p)); --rot: calc(-1.5deg * (1 - var(--p)) - 9deg * var(--k) * var(--p)); }
+.fan.is-open .bank[data-slot="2"] { --ty: calc(var(--w) * -.03 * var(--p)); }
+.fan.is-open .bank[data-slot="3"] { --tx: calc(var(--w) * .26 * var(--k) * var(--p)); --ty: calc(3px * (1 - var(--p)) + var(--w) * .025 * var(--k) * var(--p)); --rot: calc(1.5deg * (1 - var(--p)) + 9deg * var(--k) * var(--p)); }
+.fan.is-open .bank[data-slot="4"] { --tx: calc(var(--w) * .5 * var(--k) * var(--p)); --ty: calc(7px * (1 - var(--p)) + var(--w) * .1 * var(--k) * var(--p)); --rot: calc(3deg * (1 - var(--p)) + 18deg * var(--k) * var(--p)); }
+.bank__face { position: absolute; inset: 0; border-radius: calc(var(--w) * .06); padding: calc(var(--w) * .066); color: #fff; overflow: hidden;
+  display: flex; flex-direction: column;
+  box-shadow: 0 1px 1px rgba(0,0,0,.08), 0 14px 30px -10px rgba(15,23,42,.45), inset 0 0 0 1px rgba(255,255,255,.08);
+  transition: translate .45s var(--ease-out), scale .45s var(--ease-out), box-shadow .45s var(--ease-out); }
+@media (hover: hover) {
+  .fan.is-open .bank:hover { z-index: 9; transition: transform .75s var(--ease-out) var(--delay, 0ms), z-index 0s; }
+  .fan.is-open .bank:hover .bank__face { translate: 0 -14px; scale: 1.04; box-shadow: 0 1px 1px rgba(0,0,0,.08), 0 30px 50px -18px rgba(15,23,42,.55), inset 0 0 0 1px rgba(255,255,255,.1); }
+}
+.fan.is-open .bank:active .bank__face { translate: 0 -6px; scale: 1.01; }
+/* вытащенная карта — поверх остальных и выше; повторный клик кладёт её обратно */
+.fan.is-open .bank.is-picked { z-index: 10; transition: transform .75s var(--ease-out), z-index 0s; }
+.fan.is-open .bank.is-picked .bank__face { translate: 0 -30px; scale: 1.06; box-shadow: 0 1px 1px rgba(0,0,0,.08), 0 36px 56px -20px rgba(15,23,42,.6), inset 0 0 0 1px rgba(255,255,255,.12); }
+.bank__face::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(115deg, rgba(255,255,255,.3) 0%, rgba(255,255,255,0) 36%, rgba(255,255,255,0) 64%, rgba(255,255,255,.12) 100%); }
+.bank__top { display: flex; align-items: center; gap: calc(var(--w) * .036); font-weight: 650; font-size: calc(var(--w) * .06); letter-spacing: -.01em; line-height: 1; }
+.bank__logo { width: calc(var(--w) * .13); height: calc(var(--w) * .13); border-radius: 28%; background: #fff; object-fit: cover; flex: none; }
+.bank__nfc { margin-left: auto; width: calc(var(--w) * .052); height: auto; opacity: .9; }
+.bank__chip { margin-top: calc(var(--w) * .08); width: calc(var(--w) * .15); aspect-ratio: 1.3; border-radius: 22%; position: relative; overflow: hidden;
+  background: linear-gradient(135deg, #F6E7BE, #C9A55E 55%, #EFD9A0); }
+.bank__chip::before, .bank__chip::after { content: ""; position: absolute; background: rgba(90,60,10,.35); }
+.bank__chip::before { left: 0; right: 0; top: 50%; height: 1px; }
+.bank__chip::after { top: 0; bottom: 0; left: 36%; width: 1px; box-shadow: calc(var(--w) * .042) 0 0 rgba(90,60,10,.35); }
+.bank__num { margin-top: auto; font: 500 calc(var(--w) * .054)/1 var(--f-mono); font-stretch: 87%; letter-spacing: .12em; opacity: .94; }
+.bank__bottom { display: flex; align-items: flex-end; justify-content: space-between; margin-top: calc(var(--w) * .045); font-size: calc(var(--w) * .046); opacity: .92; line-height: 1; }
+.bank__mir { font: 800 italic calc(var(--w) * .074)/1 var(--f); letter-spacing: -.02em; }
+.bank--t .bank__face { background: linear-gradient(145deg, #2E2E2E, #0B0B0B 58%, #1D1D1D); }
+.bank--alfa .bank__face { background: linear-gradient(145deg, #FF5A44, #EF3124 45%, #B3141B); }
+.bank--sber .bank__face { background: linear-gradient(145deg, #45C866, #21A038 45%, #0E7530); }
+.bank--vtb .bank__face { background: linear-gradient(145deg, #3371FF, #0A2896 60%, #06185F); }
+.bank--ozon .bank__face { background: linear-gradient(135deg, #2D74FF, #005BFF 30%, #7B2FE0 68%, #F1117E); }
+/* правые карты: логотип и название справа — банк виден, даже когда левую половину закрывает соседняя карта */
+.bank--r .bank__top { flex-direction: row-reverse; }
+.bank--r .bank__nfc { margin-left: 0; margin-right: auto; scale: -1 1; }
+.bank--r .bank__chip { align-self: flex-end; }
+.bank--r .bank__num { text-align: right; }
+.bank--r .bank__bottom { justify-content: flex-end; }
+@media (prefers-reduced-motion: reduce) { .bank, .bank__face, .fan__stage, .fan__floor { transition: none !important; } }
+@media (max-width: 999px) { .fan { margin-block: 8px 4px; } }
+/* на узком экране веер собраннее, чтобы крайние карты не выходили за край */
+@media (max-width: 600px) { .fan { --k: .62; height: clamp(210px, 60vw, 260px); } .bank { --w: clamp(150px, 44vw, 210px); bottom: 16%; } }
+
+/* ---------- разделы-плитки ---------- */
+.sec { padding-top: clamp(56px, 8vw, 104px); }
+.sec__head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px 24px; margin-bottom: 28px; }
+.sec__head h2 { margin: 0; font: 750 clamp(2rem, 4.2vw, 3.25rem)/1 var(--f); letter-spacing: -.045em; }
+.sec__head p { margin: 0; max-width: 28em; color: var(--muted); }
+.bento { display: grid; gap: 14px; grid-template-columns: repeat(6, minmax(0, 1fr)); list-style: none; margin: 0; padding: 0; }
+.bento li { grid-column: span 2; min-width: 0; }
+.bento li:nth-child(4), .bento li:nth-child(5) { grid-column: span 3; }
+@media (max-width: 900px) { .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); } .bento li, .bento li:nth-child(4), .bento li:nth-child(5) { grid-column: span 1; } .bento li:last-child:nth-child(odd) { grid-column: span 2; } }
+.tile { position: relative; display: grid; grid-template-columns: 1fr auto; gap: 18px 16px; align-content: space-between; min-height: 196px; height: 100%; padding: 24px; border-radius: var(--radius);
+  background: var(--surface); text-decoration: none; transition: background-color .25s; }
+@media (hover: hover) { .tile:hover { background: var(--surface-2); } .tile:hover .tile__arrow { transform: rotate(-45deg); } }
+.tile__ico { display: block; width: 64px; height: 64px; }
+.tile__arrow { width: 40px; height: 40px; border-radius: 50%; background: #fff; display: grid; place-items: center; transition: transform .35s var(--ease-out); }
+.tile__arrow svg { width: 18px; height: 18px; }
+.tile__txt { grid-column: 1 / -1; }
+.tile__txt b { display: block; color: var(--ink); font: 700 1.375rem/1.15 var(--f); letter-spacing: -.02em; }
+.tile__txt > span { display: block; margin-top: 6px; color: var(--muted); font-size: .9375rem; }
+/* эмодзи двигаются только при наведении или фокусе — в покое плитки тихие и стоят в первом кадре
+   (специфичность выше правил emoji.css, иначе «Сим-карты» мигали бы без наведения) */
+@media (hover: hover) { .bento .tile:not(:hover):not(:focus-visible) .emj * { animation-name: none; } }
+@media (hover: none) { .bento .tile:not(:focus-visible) .emj * { animation-name: none; } }
+@media (prefers-reduced-motion: reduce) { .tile .emj * { animation: none !important; } .tile, .tile__arrow { transition: none; } }
+@media (max-width: 600px) {
+  .tile { min-height: 150px; padding: 18px; gap: 14px 10px; border-radius: 22px; }
+  .tile__ico { width: 48px; height: 48px; }
+  .tile__arrow { width: 34px; height: 34px; }
+  .tile__txt b { font-size: 1.125rem; }
+  .tile__txt > span { font-size: .8125rem; }
+  .tile__note { display: none; }
+}
+@media (max-width: 340px) { .bento { grid-template-columns: minmax(0, 1fr); } .bento li, .bento li:last-child:nth-child(odd) { grid-column: span 1; } }
+
+/* ---------- каталог: светлая полоса, белые карточки ---------- */
+.catalog { margin-top: clamp(56px, 8vw, 104px); padding: clamp(48px, 6vw, 80px) 0 clamp(56px, 7vw, 96px); background: var(--surface); }
+.catalog .sec__head { margin-bottom: 16px; }
+.filters { position: sticky; top: calc(var(--hdr, 69px) - 1px); z-index: 20; margin-inline: calc(var(--gutter) * -1); padding: 12px var(--gutter); background: rgba(244,245,247,.9); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
+.seg { position: relative; display: flex; gap: 4px; padding: 7px; border-radius: 29px; background: #fff; box-shadow: 0 0 0 1px var(--line), 0 1px 2px rgba(15,23,42,.04); overflow-x: auto; scrollbar-width: thin; scroll-padding-inline: 12px; width: max-content; max-width: 100%; }
+/* position: relative — чтобы скрытые подписи (.vh) внутри кнопок оставались в ленте и не растягивали страницу на телефоне */
+.fbtn { position: relative; flex: none; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 18px; border-radius: 999px; border: 0; background: transparent; color: var(--ink-2); font-weight: 500; font-size: .9375rem; cursor: pointer; transition: background-color .2s, color .2s; }
+.fbtn:hover { background: var(--surface); }
+.fbtn span { font: 600 .75rem/1 var(--f-mono); font-stretch: 87%; color: var(--muted); }
+.fbtn[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.fbtn[aria-pressed="true"] span { color: #C9CDD6; }
+@media (forced-colors: active) {
+  .fbtn[aria-pressed="true"] { forced-color-adjust: none; background: Highlight; color: HighlightText; border-color: Highlight; }
+  .fbtn[aria-pressed="true"] span { color: HighlightText; }
+  .fbtn[aria-pressed="true"]:focus-visible { outline-color: CanvasText; }
+}
+.cat, #sections .cta, .cat__more { scroll-margin-top: var(--flt, 78px); }
+@media (max-height: 480px) { .filters { position: static; } html { scroll-padding-top: 80px; } .cat, #sections .cta, .cat__more { scroll-margin-top: 0; } }
+
+.cat { padding-top: 32px; }
+.cat[hidden] { display: none; }
+.cat__head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 16px; }
+.cat h3 { margin: 0; font: 700 1.5rem/1.1 var(--f); letter-spacing: -.03em; }
+.cat__head > span { color: var(--muted); font: 600 .8125rem/1 var(--f-mono); font-stretch: 87%; }
+.cat__head { flex-wrap: wrap; }
+.cat__more { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 16px; border-radius: 999px; background: #fff; color: var(--ink); font-size: .9375rem; font-weight: 500; text-decoration: none; box-shadow: 0 0 0 1px var(--line); }
+.cat__more svg { width: 16px; height: 16px; }
+@media (hover: hover) { .cat__more:hover { box-shadow: 0 0 0 1px var(--ink-2); } }
+.grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(min(288px, 100%), 1fr)); list-style: none; margin: 0; padding: 0; }
+
+/* Карточка не двигается при наведении (иначе дрожит у нижнего края) — «оживает» картинка сверху и тень. */
+/* клик по любому месту карточки нажимает её кнопку (js/app.js), текст при этом можно выделять */
+.card { --brand: #64748B; cursor: pointer; position: relative; display: flex; flex-direction: column; min-width: 0; border-radius: 24px; background: #fff; overflow: hidden;
+  box-shadow: 0 0 0 1px rgba(15,23,42,.06), 0 1px 2px rgba(15,23,42,.04); transition: box-shadow .35s var(--ease-out); }
+.card__media { order: -1; }
+@media (hover: hover) {
+  .card:hover { box-shadow: 0 0 0 1px rgba(15,23,42,.08), 0 22px 44px -22px rgba(15,23,42,.3), 0 6px 14px -8px rgba(15,23,42,.1); }
+      }
+.card__media { position: relative; height: 152px; display: grid; place-items: center; overflow: hidden; background: var(--surface);
+  background: radial-gradient(90% 80% at 50% 0%, rgba(255,255,255,.65), rgba(255,255,255,0) 70%), color-mix(in srgb, var(--brand) 14%, #fff); }
+.card__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+/* мини-карта банка — для дебетовых и кредитных: выглядывает снизу, при наведении приподнимается */
+.mini { --ink-card: #fff; align-self: end; margin-bottom: -26px; width: 184px; aspect-ratio: 1.586; border-radius: 12px; padding: 13px 14px; display: flex; flex-direction: column; position: relative; overflow: hidden; color: var(--ink-card);
+  background: var(--brand); background: linear-gradient(140deg, color-mix(in srgb, var(--brand) 80%, #fff), var(--brand) 46%, color-mix(in srgb, var(--brand) 74%, #000));
+  box-shadow: 0 16px 28px -14px color-mix(in srgb, var(--brand) 55%, #0B0D12), 0 2px 5px rgba(15,23,42,.12), inset 0 0 0 1px rgba(255,255,255,.14);
+  rotate: -4deg; transition: translate .55s var(--ease-out), rotate .55s var(--ease-out); }
+.mini.is-light { --ink-card: #0B0D12; }
+.mini::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(115deg, rgba(255,255,255,.34), rgba(255,255,255,0) 40%, rgba(255,255,255,0) 66%, rgba(255,255,255,.12)); }
+.mini__top { display: flex; align-items: center; gap: 7px; font: 650 .75rem/1 var(--f); letter-spacing: -.01em; min-width: 0; }
+.mini__top span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mini__logo { width: 22px; height: 22px; border-radius: 6px; background: #fff; object-fit: cover; flex: none; }
+.mini__nfc { margin-left: auto; width: 9px; height: auto; flex: none; opacity: .85; }
+.mini__row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 16px; }
+.mini__chip { width: 27px; height: 21px; border-radius: 5px; flex: none; background: linear-gradient(135deg, #F6E7BE, #C9A55E 55%, #EFD9A0); }
+.mini__num { font: 500 .6875rem/1 var(--f-mono); font-stretch: 87%; letter-spacing: .1em; white-space: nowrap; opacity: .92; }
+/* крупный логотип — для займов, связи и работы */
+.card__logo { width: 72px; height: 72px; margin-top: 16px; border-radius: 20px; background: #fff; object-fit: contain;
+  box-shadow: 0 14px 26px -14px color-mix(in srgb, var(--brand) 60%, #0B0D12), 0 0 0 1px rgba(15,23,42,.06);
+  transition: translate .55s var(--ease-out), scale .55s var(--ease-out); }
+.card__logo--mono { display: grid; place-items: center; font: 800 2rem/1 var(--f); color: var(--ink); }
+.badges { position: absolute; left: 14px; top: 14px; right: 14px; z-index: 2; pointer-events: none; display: flex; flex-wrap: wrap; gap: 6px; list-style: none; margin: 0; padding: 0; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px; background: #fff; color: var(--ink-2); font: 600 .75rem/1 var(--f); white-space: nowrap; box-shadow: 0 1px 2px rgba(15,23,42,.1); }
+.chip i { width: 6px; height: 6px; border-radius: 50%; background: var(--dot, var(--ink)); flex: none; }
+.chip--accr { --dot: var(--signal); } .chip--live { --dot: var(--ink); } .chip--topup { --dot: #7A5CFF; } .chip--check { --dot: #2F6BFF; }
+.chip--out { --dot: #16A34A; } .chip--hold { --dot: #F5A300; } .chip--rates { --dot: #9AA1AE; }
+
+.card__body { display: flex; flex-direction: column; gap: 8px; padding: 18px 20px 20px; flex: 1; }
+.card__titles { display: flex; flex-direction: column; min-width: 0; }
+.card__brand { order: -1; font-size: .8125rem; color: var(--muted); }
+.card h4 { margin: 1px 0 0; font: 700 1.1875rem/1.2 var(--f); letter-spacing: -.02em; }
+.card__cond { margin: 2px 0 0; font: 600 1rem/1.35 var(--f); color: var(--ink); }
+.card--hr .card__cond { color: #15803D; }
+.card__desc { margin: 0; color: var(--muted); font-size: .9375rem; line-height: 1.5; }
+.specs { margin: 6px 0 0; padding: 0; }
+.specs div { display: grid; grid-template-columns: minmax(88px, 38%) 1fr; gap: 12px; padding: 9px 0; border-top: 1px solid var(--line); font-size: .875rem; line-height: 1.35; }
+.spec-note { margin: 0; padding: 9px 0; border-top: 1px solid var(--line); font-size: .875rem; line-height: 1.35; color: var(--ink-2); }
+/* в колонке карточки между блоками gap 8px — строки деталей идут вплотную, как ряды списка */
+.specs + .spec-note, .spec-note + .spec-note { margin-top: -8px; }
+.specs dt { color: var(--muted); }
+.specs dd { margin: 0; color: var(--ink-2); }
+.card__foot { margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 10px; }
+.cta { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 18px; border-radius: 999px; border: 0; background: var(--ink); color: #fff;
+  font: 600 .9375rem/1 var(--f); text-decoration: none; cursor: pointer; white-space: nowrap; transition: background-color .2s, gap .3s var(--ease-out); }
+.cta svg { width: 16px; height: 16px; flex: none; }
+.ad { font-size: .75rem; line-height: 1.3; color: var(--muted); text-align: right; }
+.card__note { margin: 0; font-size: .875rem; color: var(--muted); }
+.card__note:empty { display: none; }
+@media (max-width: 600px) { .card__media { height: 136px; } .card__body { padding: 16px 18px 18px; } }
+@media (prefers-reduced-motion: reduce) { .card, .mini, .card__logo, .cta { transition: none; } }
+/* контрастные темы Windows убирают фоны и тени — возвращаем рамки системными цветами */
+@media (forced-colors: active) {
+  .btn, .fbtn, button.cta { border: 1px solid ButtonText; }
+  a.btn, a.cta, .tile, .cat__more { border: 1px solid LinkText; }
+  .card, .seg { border: 1px solid CanvasText; }
+}
+@media (prefers-reduced-transparency: reduce) { .hdr, .filters { background: #fff; -webkit-backdrop-filter: none; backdrop-filter: none; } .catalog .filters { background: var(--surface); } }
+
+/* ---------- вопросы и подвал ---------- */
+.faq { max-width: 860px; }
+.faq details { border-bottom: 1px solid var(--line); }
+.faq details:first-of-type { border-top: 1px solid var(--line); }
+.faq summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 22px 0; font: 600 1.125rem/1.3 var(--f); letter-spacing: -.01em; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: ""; width: 10px; height: 10px; flex: none; margin-right: 4px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg) translateY(-3px); transition: transform .3s var(--ease-out); }
+.faq details[open] summary::after { transform: rotate(-135deg) translateY(-3px); }
+.faq details p { margin: 0 0 22px; color: var(--muted); max-width: 44em; }
+.ftr { margin-top: clamp(64px, 9vw, 120px); padding: 40px 0 56px; background: var(--surface); }
+.ftr__grid { display: grid; gap: 20px; }
+@media (min-width: 900px) { .ftr__grid { grid-template-columns: 1fr 2fr; } }
+.ftr p { margin: 0 0 10px; color: var(--muted); font-size: .875rem; max-width: 62em; }
+.state { padding: 32px 0; color: var(--muted); }

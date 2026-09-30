@@ -1,0 +1,18 @@
+Options -Indexes
+AddDefaultCharset UTF-8
+DirectoryIndex index.html
+
+# служебное — не наружу
+<FilesMatch "^(README\.md|deploy\.sh|.*\.sample\.php|.*\.tmp.*)$">
+  Require all denied
+</FilesMatch>
+RedirectMatch 403 ^/tools/
+
+# каталог меняется ботом — не кешировать
+<IfModule mod_headers.c>
+  <FilesMatch "\.json$">
+    Header set Cache-Control "no-store"
+  </FilesMatch>
+</IfModule>
+
+RedirectMatch 403 ^/_v1/
