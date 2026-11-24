@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Вход — Панель управления — Витрина</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#111111">
+<link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="panel.css?v=20261125045437">
+</head>
+<body>
+
+<!-- Живые области: существуют с загрузки страницы, всегда пустые и никогда
+     не перерисовываются. Роли не меняем — платформа кэширует их при разборе. -->
+<p class="vh" role="status" id="a-status"></p>
+<p class="vh" role="alert" id="a-alert"></p>
+
+<!-- Экран входа. Пароль спрашивается при каждом открытии страницы: gate.js
+     сразу гасит старую сессию и до успешного входа держит редактор скрытым.
+     Гейт и редактор — два main: наружу всегда выставлен ровно один. -->
+<main class="gate" id="gate" aria-labelledby="gate-title">
+  <form class="gate__box" id="gate-form" novalidate>
+    <h1 id="gate-title">Вход в панель витрины</h1>
+    <p class="gate__intro" id="gate-intro">Здесь правятся разделы и предложения витрины: названия, условия,
+       партнёрские ссылки и порядок. Пароль спрашивается при каждом входе.</p>
+    <!-- Менеджеру паролей нужно поле логина рядом с паролем, иначе он не
+         сохранит запись. Людям и скринридеру оно ни к чему. -->
+    <input type="text" name="username" value="vitrina" autocomplete="username" readonly
+           class="vh" tabindex="-1" aria-hidden="true">
+    <label for="gate-pass">Пароль сайта</label>
+    <div class="gate__row">
+      <input type="password" id="gate-pass" name="sitekey" class="js-ring"
+             autocomplete="current-password" autocapitalize="off" autocorrect="off"
+             spellcheck="false" enterkeyhint="go"
+             aria-describedby="gate-pass-err gate-pass-hint">
+      <button class="abtn" type="button" id="gate-eye" aria-pressed="false">Показать пароль</button>
+    </div>
+    <p class="hint" id="gate-pass-hint">Общий пароль этого сайта, не ваш личный. Его даёт разработчик; сменить можно в самой панели.</p>
+    <p class="field__error" id="gate-pass-err"></p>
+    <button class="abtn abtn--main gate__submit" type="submit" id="gate-ok">Войти</button>
+  </form>
+</main>
+
+<a class="skip-link" href="#main" hidden>Перейти к содержимому</a>
+
+<header class="admin-header" hidden>
+  <div class="wrap admin-header__inner">
+    <a href="index.html">Витрина<span>Открыть сайт</span></a>
+  </div>
+</header>
+
+<main id="main" tabindex="-1" hidden>
+  <div class="wrap">
+
+    <div class="admin-head">
+      <h1>Панель управления</h1>
+      <p>Здесь меняются разделы и предложения — названия, условия, партнёрские ссылки, логотипы, плашки
+         и порядок — и тексты сайта. Нажали «Сохранить на сайт» — правки сразу видят посетители. Ниже —
+         смена пароля от самой панели.</p>
+    </div>
+
+    <nav class="panel-nav" aria-label="Разделы панели">
+      <a href="#texts">Тексты</a>
+      <a href="#groups">Разделы и предложения</a>
+      <a href="#pass">Пароль</a>
+    </nav>
+
+    <section class="panel-sec panel-sec--first" id="catalog" aria-labelledby="catalog-h" tabindex="-1">
+      <h2 id="catalog-h" class="vh">Тексты, разделы и предложения</h2>
+
+      <div class="howto">
+        <h3 class="howto__title">Как ваши правки попадают на сайт</h3>
+        <ol class="howto__steps">
+          <li>Меняете предложения и тексты. Всё сохраняется само, нажимать ничего не нужно.</li>
+          <li>«Предпросмотр» — смотрите, как получилось. Это видите только вы.</li>
+          <li>«Сохранить на сайт» — правки видят посетители. Файлы скачивать не надо.</li>
+        </ol>
+        <p class="howto__note"><strong>Пока вы не нажали «Сохранить на сайт», на сайте старая версия.</strong></p>
+      </div>
+
+      <div class="admin-top">
+        <button class="abtn abtn--main" type="button" id="publish" aria-describedby="publish-hint">Сохранить на сайт</button>
+        <button class="abtn" type="button" id="preview">Предпросмотр</button>
+        <button class="abtn" type="button" id="check">Проверить</button>
+        <button class="abtn" type="button" id="download">Скачать резервную копию</button>
+        <button class="abtn" type="button" id="zip" hidden>Скачать сайт целиком</button>
+        <button class="abtn" type="button" id="logout" hidden>Выйти</button>
+        <p class="admin-state" id="state">Черновик пуст</p>
+      </div>
+      <p class="hint" id="publish-hint">Отправит правки на боевой сайт. Файл скачивать не нужно.</p>
+
+      <!-- Что сейчас на сайте. Живой областью намеренно НЕ делается: строка
+           обновляется при каждой правке и заговорила бы сама с собой. -->
+      <p class="admin-state" id="publish-state">Проверяю, работает ли сохранение на сайт…</p>
+
+      <div class="summary-box" id="error-summary" tabindex="-1" hidden>
+        <h3 id="error-summary-title">Проверка не пройдена</h3>
+        <ul id="error-summary-list"></ul>
+      </div>
+
+      <a class="skip-inline" href="#editor-actions">Пропустить тексты и предложения</a>
+
+      <form id="form" novalidate>
+        <section class="texts" id="texts" aria-labelledby="texts-h" tabindex="-1">
+          <h2 id="texts-h">Тексты сайта</h2>
+          <p class="sec-sub">Блоки идут в том же порядке, что на странице. Откройте нужный — поля внутри.
+             Пустое необязательное поле — строки или кнопки на сайте не будет.</p>
+          <div class="tblocks" id="site-fields"></div>
+        </section>
+
+        <h2 class="groups-h" id="groups-h">Разделы и предложения</h2>
+        <p class="sec-sub">Раздел — плитка в первом экране и кнопка-фильтр над каталогом. Порядок предложений здесь = порядок на сайте.
+           В разделе «Работа» кнопки ведут на сайт агентства — ссылку туда вписывать не нужно.</p>
+        <div id="groups" tabindex="-1" aria-labelledby="groups-h"></div>
+      </form>
+
+      <div class="editor-actions" id="editor-actions" tabindex="-1">
+        <button class="abtn abtn--main" type="button" id="publish-2" aria-describedby="publish-hint">Сохранить на сайт</button>
+        <button class="abtn" type="button" id="preview-2">Предпросмотр</button>
+        <button class="abtn" type="button" id="download-2">Скачать резервную копию</button>
+        <button class="abtn abtn--danger" type="button" id="rollback" hidden>Вернуть предыдущую версию</button>
+        <button class="abtn abtn--danger" type="button" id="reset">Сбросить черновик</button>
+      </div>
+
+      <p class="hint editor-note">
+        Сброс возвращает всё к тому, что сейчас на сайте — несохранённые правки теряются.
+        «Вернуть предыдущую версию» откатывает сам сайт к тому, что было до последнего сохранения.
+      </p>
+    </section>
+
+    <!-- ═══════════════ ПАРОЛЬ ═══════════════ -->
+    <section class="panel-sec" id="pass" aria-labelledby="pass-h" tabindex="-1">
+      <h2 id="pass-h">Пароль от панели</h2>
+      <p class="sec-sub">Меняется сразу. На других устройствах после этого придётся войти заново — так и задумано:
+         если пароль куда-то утёк, чужая вкладка перестанет работать.</p>
+      <p class="hint note" id="pass-note" hidden></p>
+
+      <div id="pass-body">
+        <div class="summary-box" id="pass-errs" tabindex="-1" hidden>
+          <h3 id="pass-errs-h">Проверьте форму</h3>
+          <ul id="pass-err-list"></ul>
+        </div>
+
+        <form id="pass-form" class="fields" novalidate>
+          <!-- Менеджеру паролей нужно поле логина рядом с паролями, иначе он
+               сохранит запись без учётки и в следующий раз подставит старый
+               пароль. Именно type="text" в классе vh: поле со type="hidden"
+               браузеры за логин не считают. -->
+          <input type="text" id="p-user" name="username" value="vitrina" autocomplete="username" readonly
+                 class="vh" tabindex="-1" aria-hidden="true">
+
+          <div class="field wide">
+            <label for="p-old">Текущий пароль</label>
+            <input id="p-old" type="password" name="current-password" required
+                   autocomplete="current-password" autocapitalize="none" autocorrect="off"
+                   spellcheck="false" aria-describedby="p-old-err">
+            <p class="field__error" id="p-old-err"></p>
+          </div>
+
+          <div class="field wide">
+            <label for="p-new">Новый пароль</label>
+            <input id="p-new" type="password" name="new-password" required minlength="8"
+                   autocomplete="new-password" autocapitalize="none" autocorrect="off"
+                   spellcheck="false" aria-describedby="p-new-err p-new-hint">
+            <p class="field__error" id="p-new-err"></p>
+            <p class="hint" id="p-new-hint">Не короче 8 символов, без пробелов и не такой же, как текущий.</p>
+          </div>
+
+          <div class="field wide">
+            <label for="p-new2">Новый пароль ещё раз</label>
+            <input id="p-new2" type="password" name="confirm-password" required minlength="8"
+                   autocomplete="new-password" autocapitalize="none" autocorrect="off"
+                   spellcheck="false" enterkeyhint="done" aria-describedby="p-new2-err">
+            <p class="field__error" id="p-new2-err"></p>
+          </div>
+
+          <!-- Галочка, а не кнопка: она сама объявляет своё состояние, это
+               один таб-стоп вместо трёх, и оба новых пароля видно сразу. -->
+          <div class="field wide">
+            <label class="check"><input type="checkbox" id="p-show"> Показать пароли</label>
+          </div>
+
+          <div class="field wide">
+            <button type="submit" class="abtn abtn--main" id="pass-submit">Сменить пароль</button>
+          </div>
+        </form>
+
+        <p class="status" id="pass-status"></p>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<!-- Диалог — прямой ребёнок body: внутри перерисовываемого списка он бы
+     выпал из верхнего слоя вместе с карточкой, и страница осталась бы
+     заблокированной. -->
+<dialog class="ask" id="ask" role="alertdialog" aria-labelledby="ask-title" aria-describedby="ask-text">
+  <h2 id="ask-title">Удалить карточку?</h2>
+  <p id="ask-text"></p>
+  <div class="ask__actions">
+    <button class="abtn" type="button" id="ask-no">Отмена</button>
+    <button class="abtn abtn--danger" type="button" id="ask-yes">Удалить</button>
+  </div>
+</dialog>
+
+<!-- Порядок важен: сначала вход, потом данные сайта, схема проекта, ядро,
+     модуль публикации (берёт из ядра готовый файл) и смена пароля. -->
+<script src="gate.js?v=20261125045437"></script>
+<script>if(typeof OFFERS==="undefined"){document.write('<script src="data.js?v=20261125045437"><\/script>');}</script>
+<script src="panel-schema.js?v=20261125045437"></script>
+<script src="panel-core.js?v=20261125045437"></script>
+<script src="publish.js?v=20261125045437"></script>
+<script src="panel-pass.js?v=20261125045437"></script>
+</body>
+</html>

@@ -1,0 +1,491 @@
+/* ==========================================================================
+   ОФОРМЛЕНИЕ ПАНЕЛИ — одинаковое во всех витринах.
+
+   Файл самодостаточный: он НЕ наследует стили сайта. Иначе панель выглядела
+   бы на каждой витрине по-своему, а человек, который ведёт несколько сайтов,
+   каждый раз заново искал бы нужную кнопку.
+
+   Контрасты просчитаны к тёмному фону по WCAG 2.2 AA.
+   ========================================================================== */
+
+:root {
+  --bg-base:      #111111;
+  --bg-surface:   #1c1c1c;
+  --bg-surface-2: #222222;
+
+  --text-primary:   #f0f0f0;   /* 16.6:1 на #111 */
+  --text-secondary: #b3b3b3;   /*  9.0:1 */
+  --text-muted:     #999999;   /*  6.6:1 */
+  --text-inactive:  #a0a0a0;   /*  7.2:1 — состояние «занято», не opacity */
+
+  --accent:         #7DD3FC;   /* голубой сайта, 11:1 с тёмной подписью и на #111 */
+  --accent-hover:   #BAE6FD;
+  --accent-ink:     #111111;   /* тёмная подпись на светлом камне, 14:1 */
+
+  --border-line:    #333333;   /* только декоративные разделители */
+  --border-ui:      #757575;   /* граница элементов управления, 3.7:1 */
+  --border-strong:  #b3b3b3;
+
+  --danger-text:    #ff8a8a;
+  --danger-border:  #ff6b6b;
+  --warning-text:   #ffc46b;
+  --warning-bg:     #2a2214;   /* янтарная подложка предупреждения */
+  --success-text:   #4ade80;
+  --focus-ring:     #ffffff;
+
+  --radius: 14px;
+  color-scheme: dark;
+  scrollbar-gutter: stable;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0; padding-bottom: 80px;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 17px; line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3, h4 { line-height: 1.2; margin: 0; letter-spacing: -.01em; }
+p { margin: 0; }
+a { color: var(--accent); }
+img, svg { max-width: 100%; }
+
+.wrap { width: min(100% - 40px, 1180px); margin-inline: auto; }
+
+.vh {
+  position: absolute; width: 1px; height: 1px;
+  margin: -1px; padding: 0; border: 0;
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+}
+
+:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 2px; }
+/* Программный фокус (после удаления, по ссылке из сводки) должен быть виден
+   и тогда, когда до этого работали мышью: :focus-visible не сработает. */
+.js-ring:focus, #error-summary:focus, #pass-errs:focus { outline: 3px solid var(--focus-ring); outline-offset: 3px; }
+
+.skip-link {
+  position: absolute; left: 16px; top: 8px; z-index: 50;
+  padding: 10px 18px; border-radius: 10px;
+  background: #fff; color: #111; font-weight: 600; text-decoration: none;
+  transform: translateY(-200%);
+}
+.skip-link:focus { transform: translateY(0); }
+
+/* ------------------------------------------------------------ шапка --- */
+
+.admin-header {
+  border-bottom: 1px solid var(--border-line);
+  background: var(--bg-base);
+}
+.admin-header__inner { display: flex; align-items: center; gap: 16px; min-height: 68px; }
+.admin-header a { color: var(--text-primary); text-decoration: none; font-weight: 700; }
+.admin-header span { color: var(--text-muted); font-size: .85rem; font-weight: 400; display: block; }
+
+.admin-head { padding: 28px 0 6px; }
+.admin-head h1 { font-size: clamp(28px, 4vw, 40px); }
+.admin-head p { margin-top: 14px; max-width: 70ch; color: var(--text-secondary); }
+
+/* Ссылки по разделам панели: каталог длинный, а заявки и пароль — под ним. */
+.panel-nav { display: flex; flex-wrap: wrap; gap: 4px 22px; margin: 14px 0 6px; }
+.panel-nav a {
+  display: inline-flex; align-items: center; min-height: 44px;
+  color: var(--text-primary); font-weight: 600;
+  text-decoration: underline; text-underline-offset: 4px;
+}
+
+/* Панель кнопок липкой намеренно не делаем: она накрывала бы поле,
+   на котором стоит фокус (2.4.11). Кнопки продублированы внизу списка. */
+.admin-top {
+  display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+  padding: 16px 0; border-bottom: 1px solid var(--border-line);
+}
+.admin-state { color: var(--text-muted); font-size: .9rem; margin-left: auto; }
+.admin-state[data-dirty="true"] { color: var(--warning-text); }
+
+.howto {
+  margin: 22px 0 6px; padding: 16px 18px;
+  border: 1px solid var(--border-line); border-radius: var(--radius);
+  background: var(--bg-surface);
+}
+.howto__title { font-size: 1.05rem; }
+.howto__steps { margin: 10px 0 0; padding-left: 22px; color: var(--text-secondary); font-size: .95rem; }
+.howto__steps li + li { margin-top: 4px; }
+.howto__note { margin-top: 12px; color: var(--text-secondary); font-size: .95rem; }
+.howto__note strong { color: var(--text-primary); }
+
+/* ----------------------------------------------------------- кнопки --- */
+
+.abtn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 44px; padding: 0 16px;
+  border: 1px solid var(--border-ui); border-radius: 12px;
+  background: var(--bg-surface-2); color: var(--text-primary);
+  font: inherit; font-size: .97rem; font-weight: 600; cursor: pointer;
+  text-decoration: none;
+}
+.abtn:hover { border-color: var(--border-strong); }
+.abtn--main { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.abtn--main:hover { background: var(--accent-hover); }
+.abtn--icon { min-width: 44px; padding: 0 10px; }
+.abtn--danger:hover { border-color: var(--danger-border); color: var(--danger-text); }
+/* Крайние кнопки порядка не выключаем через disabled: у выключенной кнопки
+   пропадает фокус, и человек оказывается в начале страницы. */
+.abtn[aria-disabled="true"] { color: var(--text-inactive); border-color: var(--text-inactive); cursor: default; }
+/* Разница цветов включённой и выключенной кнопки — всего 2,3:1, на одном
+   цвете состояние не удержать. Пунктир — та же примета, что у скрытой
+   карточки, и он виден в любой теме. */
+.abtn[aria-disabled="true"]:not(.abtn--main) { border-style: dashed; }
+.abtn--main[aria-disabled="true"] { color: var(--accent-ink); border-color: var(--accent); cursor: progress; }
+.abtn svg { flex: none; }
+/* Кнопка-переключатель «Показать пароль»: нажатое состояние видно рамкой. */
+.abtn[aria-pressed="true"] { border-color: var(--text-primary); border-width: 2px; }
+
+/* ------------------------------------------------------------ поля ---- */
+
+.fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 14px; }
+.fields .wide { grid-column: 1 / -1; }
+.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.field > label { color: var(--text-secondary); font-size: .9rem; font-weight: 600; }
+/* Ряд кнопок внутри сетки полей. */
+.field.row-inline { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 10px; }
+
+input[type="text"], input[type="url"], input[type="password"], textarea, select {
+  min-height: 44px; padding: 10px 12px;
+  /* заливка почти сливается с фоном — контраст держит граница */
+  border: 1px solid var(--border-ui); border-radius: 10px;
+  background: var(--bg-base); color: var(--text-primary);
+  font: inherit; font-size: .97rem;
+}
+textarea { min-height: 92px; resize: vertical; line-height: 1.55; }
+/* Заготовка в поле не должна быть бледнее подсказки: 6,6:1. */
+::placeholder { color: var(--text-muted); opacity: 1; }
+input:hover, textarea:hover, select:hover { border-color: var(--border-strong); }
+code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: .95em; color: var(--text-primary); }
+input[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: var(--danger-border); border-width: 2px; }
+
+.hint { color: var(--text-muted); font-size: .84rem; }
+.field__error { color: var(--danger-text); font-size: .86rem; font-weight: 600; }
+.field__error:empty { display: none; }
+
+.check { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: var(--text-secondary); font-size: .93rem; }
+.check input { width: 22px; height: 22px; accent-color: var(--accent); }
+
+/* --------------------------------------------------------- карточки --- */
+
+.agroup { margin-top: 40px; }
+/* Заголовок раздела и кнопки к нему — одной строкой, на узком экране
+   переносятся; название всегда первое, кнопки уходят под него. */
+/* 12px, а не 6: кольцо программного фокуса уходит на 6px за кнопку и
+   легло бы прямо на строку пояснения под ней. */
+.agroup__bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 12px; }
+.agroup__bar > h2 { font-size: 1.5rem; margin: 0; flex: 1 1 220px; min-width: 0; }
+/* Причину, по которой раздел не удаляется, цепляем за сам абзац, а не за
+   соседство: соседом полосы бывает и «В разделе пока нет карточек». */
+.agroup [data-role="delnote"] { margin-bottom: 12px; max-width: 70ch; }
+
+/* Кнопка нового раздела стоит после всех разделов и отделена чертой,
+   чтобы не путалась с «Добавить карточку» внутри последнего. */
+.add-group { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--border-line); }
+/* 12px: на эту кнопку встаёт фокус после удаления раздела. */
+.add-group .hint { margin-top: 12px; max-width: 70ch; }
+.agroup__meta {
+  border: 1px solid var(--border-line); border-radius: var(--radius);
+  background: var(--bg-surface); padding: 16px 18px; margin: 14px 0 20px;
+}
+.agroup__meta legend { padding: 0 8px; color: var(--text-secondary); font-size: .9rem; }
+
+.editor-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.card { border: 1px solid var(--border-line); border-radius: var(--radius); background: var(--bg-surface); }
+/* Скрытую карточку отличают и слова («Скрыта с сайта»), и рамка — не только цвет. */
+.card[data-hidden="true"] { border-style: dashed; }
+.card__row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 12px 14px; }
+.card__pos, .agroup__count { color: var(--text-muted); font-size: .85rem; font-variant-numeric: tabular-nums; flex: none; }
+.card__name { font-weight: 700; min-width: 0; flex: 1 1 220px; }
+.card__flag {
+  flex: none; padding: 2px 10px; border-radius: 999px;
+  border: 1px solid var(--border-ui); color: var(--text-secondary); font-size: .8rem;
+}
+.card__panel { padding: 4px 14px 18px; border-top: 1px solid var(--border-line); }
+.card__panel[hidden] { display: none; }
+
+.logo-modes { border: 0; margin: 0; padding: 0; }
+.logo-modes legend { color: var(--text-secondary); font-size: .9rem; font-weight: 600; padding: 0; }
+.radios { display: flex; flex-wrap: wrap; gap: 6px 20px; margin: 8px 0 12px; }
+.radios label { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; }
+.radios input { width: 22px; height: 22px; accent-color: var(--accent); }
+
+.logo-preview {
+  width: 52px; height: 52px; border-radius: 12px; flex: none;
+  background: #fff; box-shadow: inset 0 0 0 1px rgba(0,0,0,.1);
+  display: grid; place-items: center; padding: 7px; overflow: hidden;
+}
+.logo-preview img { width: 100%; height: 100%; object-fit: contain; }
+.tile-preview {
+  width: 52px; height: 52px; border-radius: 12px; flex: none;
+  display: grid; place-items: center; font-weight: 800; font-size: 1.15rem;
+  background: var(--tone, #222); color: var(--tone-ink, #fff);
+}
+.row-inline { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.color-pair { display: flex; align-items: center; gap: 8px; }
+.color-pair input[type="color"] {
+  width: 52px; height: 44px; padding: 2px; border-radius: 10px;
+  border: 1px solid var(--border-ui); background: var(--bg-base);
+}
+.color-pair input[type="text"] { width: 11ch; padding-inline: 10px; font-variant-numeric: tabular-nums; }
+.contrast { font-size: .86rem; }
+.contrast[data-state="fail"] { color: var(--danger-text); font-weight: 600; }
+.contrast[data-state="warn"] { color: var(--warning-text); }
+.contrast[data-state="pass"] { color: var(--success-text); }
+/* Строка про маркировку под ссылкой — тот же приём, что и у контраста:
+   цвет плюс состояние в разметке. */
+[data-role="erid"][data-state="warn"] { color: var(--warning-text); }
+[data-role="erid"][data-state="pass"] { color: var(--success-text); }
+
+/* ----------------------------------------------------------- сводка --- */
+
+.summary-box {
+  margin: 18px 0 0; padding: 16px 18px;
+  border: 2px solid var(--danger-border); border-radius: var(--radius);
+  background: var(--bg-surface);
+}
+.summary-box h2, .summary-box h3 { font-size: 1.15rem; color: var(--danger-text); }
+.summary-box ul { margin: 10px 0 0; padding-left: 20px; }
+.summary-box li + li { margin-top: 6px; }
+
+.editor-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 34px 0 10px; }
+.editor-note { margin-bottom: 8px; }
+
+/* Ссылка-обход длинного списка: в потоке, видна только под фокусом.
+   Реагирует на :focus, а не :focus-visible — иначе невидимо съедает Tab. */
+.skip-inline {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0;
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+}
+.skip-inline:focus {
+  position: static; width: auto; height: auto; clip-path: none;
+  display: inline-block; margin: 0 0 20px; padding: 12px 20px;
+  background: #fff; color: #111; font-weight: 600; border-radius: 10px;
+}
+
+/* ---------------------------------------------------------- диалоги --- */
+
+dialog.ask {
+  max-width: 460px; width: calc(100% - 32px); padding: 22px;
+  /* тёмный диалог на тёмном фоне различим только по границе */
+  border: 1px solid var(--border-ui); border-radius: var(--radius);
+  background: var(--bg-surface); color: var(--text-primary);
+}
+dialog.ask::backdrop { background: rgba(0,0,0,.72); }
+dialog.ask h2 { font-size: 1.2rem; }
+dialog.ask p { margin-top: 10px; color: var(--text-secondary); }
+.ask__actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+.pass-row { display: flex; gap: 8px; align-items: flex-start; }
+.pass-row input { flex: 1 1 auto; min-width: 0; }
+
+.spinner {
+  width: 14px; height: 14px; flex: none;
+  border: 2px solid currentColor; border-right-color: transparent;
+  border-radius: 50%; animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+/* Замороженная на середине вертушка хуже отсутствующей. */
+@media (prefers-reduced-motion: reduce) { .spinner { display: none; } }
+
+#publish-state { margin: 10px 0 0; }
+#publish-state[data-dirty="true"] { color: var(--warning-text); font-weight: 600; }
+#publish-state[data-dirty="false"] { color: var(--success-text); }
+
+/* В диалоге фокус ставится из кода. После открытия мышью :focus-visible
+   не срабатывает, и в окне с двумя кнопками не видно, где ты. */
+dialog.ask .abtn:focus { outline: 3px solid var(--focus-ring); outline-offset: 2px; }
+
+/* ----------------------------------------------------- разделы панели -- */
+
+.panel-sec { margin-top: 48px; padding-top: 30px; border-top: 1px solid var(--border-line); }
+.panel-sec--first { margin-top: 0; padding-top: 0; border-top: 0; }
+.sec-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
+.sec-bar h2, .panel-sec > h2 { font-size: clamp(24px, 3vw, 32px); }
+.sec-bar__acts { display: flex; flex-wrap: wrap; gap: 8px; margin-left: auto; }
+.sec-sub { margin-top: 10px; max-width: 70ch; color: var(--text-secondary); }
+.note { margin-top: 12px; max-width: 70ch; font-size: .95rem; color: var(--text-secondary); }
+
+/* Строки состояния разделов: смысл несут слова, цвет только помогает. */
+.status { margin-top: 12px; font-size: .95rem; max-width: 70ch; }
+.status:empty { display: none; }
+.status[data-tone="ok"] { color: var(--success-text); }
+.status[data-tone="bad"] { color: var(--danger-text); font-weight: 600; }
+.status[data-tone="info"] { color: var(--text-secondary); }
+.empty { margin-top: 16px; color: var(--text-secondary); }
+
+/* ----------------------------------------------------- таблица заявок -- */
+
+/* Обёртка таблицы — таб-стоп: иначе широкую таблицу нельзя доскроллить
+   с клавиатуры. Кольцо фокуса — снаружи, чтобы прокрутка его не резала. */
+.table-wrap {
+  margin-top: 18px; overflow-x: auto; scroll-padding-inline: 12px;
+  border: 1px solid var(--border-line); border-radius: var(--radius);
+  background: var(--bg-surface);
+}
+.table-wrap:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 2px; }
+.tbl { width: 100%; min-width: 560px; border-collapse: collapse; font-size: .95rem; }
+.tbl caption { text-align: left; padding: 12px 14px; color: var(--text-secondary); font-size: .9rem; }
+.tbl th, .tbl td { padding: 10px 14px; text-align: left; vertical-align: top; border-top: 1px solid var(--border-line); }
+.tbl thead th { color: var(--text-secondary); font-size: .85rem; font-weight: 600; }
+.tbl tbody th { font-weight: 700; }
+.tbl td a { color: var(--text-primary); overflow-wrap: anywhere; }
+.tbl .cell-when { white-space: nowrap; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+.tbl .cell-dash { color: var(--text-muted); }
+/* Новая заявка помечена словом, а не подсветкой строки: на тёмном фоне
+   заливку почти не видно, а в режиме высокой контрастности её нет вовсе. */
+.lead-new {
+  display: inline-block; margin-left: 8px; padding: 1px 8px;
+  border: 1px solid transparent; border-radius: 999px;
+  background: var(--accent); color: var(--accent-ink);
+  font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+  vertical-align: 2px;
+}
+
+/* ------------------------------------------------------------- телеграм */
+
+.tg-box {
+  margin-top: 20px; padding: 18px 20px 20px;
+  border: 1px solid var(--border-line); border-radius: var(--radius);
+  background: var(--bg-surface);
+}
+.tg-box h3 { font-size: 1.15rem; }
+.tg-box .sec-sub { margin-top: 6px; }
+.tg-steps { margin: 14px 0 0; padding-left: 22px; color: var(--text-secondary); font-size: .95rem; line-height: 1.6; }
+.tg-steps li + li { margin-top: 4px; }
+.tg-steps b { color: var(--text-primary); font-weight: 600; }
+.tg-note { margin: 12px 0 16px; max-width: 70ch; color: var(--text-secondary); font-size: .9rem; }
+.tg-box .fields { margin-top: 4px; }
+
+/* Предупреждение о чужих попытках. Янтарное — «обратите внимание, ничего
+   не сломано»; красный в этой палитре занят ошибками. Смысл несёт не только
+   цвет: заголовок, знак и толстая грань слева. */
+.tg-warn {
+  margin: 14px 0 18px; padding: 14px 16px 16px;
+  border: 1px solid var(--warning-text); border-left-width: 6px;
+  border-radius: var(--radius); background: var(--warning-bg);
+}
+.tg-warn h4 { font-size: 1rem; color: var(--warning-text); }
+.tg-warn h4::before {
+  content: "!" / ""; display: inline-grid; place-items: center;
+  width: 18px; height: 18px; margin-right: 8px;
+  border: 1.5px solid currentColor; border-radius: 50%;
+  font-size: .75rem; font-weight: 700; vertical-align: -2px;
+}
+.tg-warn p { margin: 8px 0 10px; color: var(--text-primary); font-size: .93rem; }
+.tg-warn ul { list-style: none; margin: 0 0 12px; padding: 0; }
+.tg-warn li {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px;
+  padding: 6px 0; border-bottom: 1px solid var(--border-ui);
+}
+.tg-warn li:last-child { border-bottom: 0; }
+
+/* Блок ссылки-приглашения. */
+.pair {
+  margin-top: 14px; padding: 16px 18px 18px;
+  border: 1px solid var(--border-ui); border-radius: var(--radius);
+  background: var(--bg-surface-2);
+}
+.pair h4 { font-size: 1rem; }
+#tg-pair-warn { margin: 8px 0 14px; max-width: 70ch; color: var(--text-secondary); font-size: .93rem; }
+.pair-go { margin: 0 0 16px; }
+.pair .field { margin-bottom: 12px; }
+/* Код диктуют по одному знаку: моноширинный, с разрядкой. Поле только для
+   чтения, но приглушать его нельзя — серый читался бы как «выключено». */
+input.pair-code {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 1.1rem; letter-spacing: .12em;
+}
+
+.tg-state { margin-top: 16px; font-size: .95rem; line-height: 1.6; }
+.tg-state h4 {
+  margin-bottom: 4px; font-size: .8rem; font-weight: 600;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--text-secondary);
+}
+.tg-state[data-state="on"] > p { color: var(--success-text); font-weight: 600; }
+.tg-state[data-state="unknown"] > p { color: var(--warning-text); }
+
+/* Получатели: строка с именем, временем и кнопкой отзыва. */
+.recips { list-style: none; margin: 8px 0 0; padding: 0; }
+.recips__row {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+  padding: 8px 0; border-bottom: 1px solid var(--border-line);
+}
+.recips__row:last-child { border-bottom: 0; }
+.recips__name { font-weight: 600; }
+.recips__when { font-size: .85rem; color: var(--text-secondary); }
+.recips__rm { margin-left: auto; }
+
+@media (max-width: 700px) {
+  .sec-bar__acts { margin-left: 0; }
+}
+
+@media (prefers-contrast: more) {
+  .card, .agroup__meta, .howto, .summary-box, .tg-box, .table-wrap { border-color: var(--border-ui); }
+  .hint, .card__pos, .agroup__count { color: var(--text-secondary); }
+  .add-group, .panel-sec { border-top-color: var(--border-ui); }
+}
+@media (forced-colors: active) {
+  .abtn { border: 1px solid ButtonText; }
+  /* aria-disabled браузеры в GrayText не переводят — делаем это сами. */
+  .abtn[aria-disabled="true"] { color: GrayText; border-color: GrayText; }
+  .tile-preview, .logo-preview { forced-color-adjust: none; }
+  .lead-new { border-color: CanvasText; }
+  .tg-warn { border: 1px solid CanvasText; border-left-width: 4px; }
+  :focus-visible { outline: 3px solid Highlight; }
+}
+
+/* Тот же предохранитель, что и на сайте: длинное значение в поле или в
+   предпросмотре переносится, а не вылезает за край панели. */
+body { overflow-wrap: break-word; }
+
+/* ----------------------------------------------------- экран входа ---- */
+/* [hidden] на шапке и main перекрыл бы любой display из правил выше —
+   подстраховка, чтобы редактор не мигнул до входа. */
+[hidden] { display: none !important; }
+
+.gate { min-height: 100dvh; display: grid; place-items: center; padding: 24px 20px; }
+.gate__box {
+  width: 100%; max-width: 440px;
+  padding: 26px 24px;
+  border: 1px solid var(--border-line); border-radius: var(--radius);
+  background: var(--bg-surface);
+}
+.gate__box h1 { font-size: 1.4rem; margin-bottom: 8px; }
+.gate__intro { margin-bottom: 18px; color: var(--text-secondary); font-size: .95rem; }
+.gate__box label { display: block; font-weight: 600; color: var(--text-secondary); font-size: .9rem; margin-bottom: 6px; }
+.gate__row { display: flex; flex-wrap: wrap; gap: 8px; align-items: stretch; }
+.gate__row input { flex: 1 1 180px; min-width: 0; }
+.gate__box .hint { margin-top: 8px; }
+.gate__box .field__error { margin-top: 8px; }
+.gate__submit { width: 100%; margin-top: 18px; }
+
+/* ── тексты сайта блоками-гармошкой (Profitly) ───────────────────────── */
+.texts { margin-bottom: 36px; }
+.texts h2, .groups-h { font-size: 1.5rem; margin-bottom: 6px; }
+.texts .sec-sub, .groups-h + .sec-sub { margin-bottom: 16px; }
+.tblocks { display: grid; gap: 10px; }
+.tblock { border: 1px solid var(--border-ui); border-radius: var(--radius); background: var(--bg-surface); }
+.tblock__sum { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; padding: 14px 18px; min-height: 52px;
+  cursor: pointer; list-style: none; border-radius: var(--radius); }
+.tblock__sum::-webkit-details-marker { display: none; }
+.tblock__sum::before { content: '+'; display: inline-grid; place-items: center; width: 24px; height: 24px; flex: 0 0 auto;
+  border: 1px solid var(--border-ui); border-radius: 6px; font-weight: 700; line-height: 1; align-self: center; }
+.tblock[open] > .tblock__sum::before { content: '−'; }
+.tblock__sum:hover { background: var(--bg-surface-2); }
+.tblock__sum:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 2px; }
+.tblock__name { font-weight: 700; font-size: 1.05rem; }
+.tblock__hint { color: var(--text-secondary); font-size: .9rem; }
+.tblock__body { padding: 4px 18px 18px; border-top: 1px solid var(--border-line); }
+.tblock__body .fields { margin-top: 14px; }
+.req { color: var(--text-secondary); font-weight: 400; font-size: .85em; }
+.groups-h { margin-top: 8px; }
+
+/* Сообщение в таблице заявок — переносится, а не растягивает таблицу. */
+.tbl .cell-msg { min-width: 14rem; max-width: 28rem; white-space: pre-line; overflow-wrap: anywhere; }

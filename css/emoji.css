@@ -1,0 +1,30 @@
+/* Анимации иконок разделов. Петля 3 с; кадр 0 — законченный знак; ничего не мигает чаще 3 раз в секунду.
+   Запуск только при наведении/фокусе на плитку — правила паузы в css/style.css (.bento .tile …). */
+.emj { display: block; width: 100%; height: 100%; overflow: visible; }
+.cd-body, .pp-plus, .nc-coin, .nc-plus, .st-up { transform-box: fill-box; transform-origin: 50% 50%; }
+@keyframes e-fade { 0%, 100% { opacity: 1; } 30% { opacity: .2; } 62% { opacity: 1; } }
+
+/* связь: дуги загораются по очереди */
+.emj-waves .a1 { animation: e-fade 1.5s ease-in-out infinite; }
+.emj-waves .a2 { animation: e-fade 1.5s ease-in-out .2s infinite; }
+.emj-waves .a3 { animation: e-fade 1.5s ease-in-out .4s infinite; }
+
+/* карта: покачивается, по ней пробегает блик */
+.cd-body { transform-box: view-box; transform-origin: 50px 50px; transform: rotate(-8deg); animation: e-tilt 3s ease-in-out infinite; }
+.cd-shine { transform-box: view-box; animation: e-shine 3s ease-in-out infinite; }
+@keyframes e-tilt { 0%, 100% { transform: rotate(-8deg); } 50% { transform: rotate(-2deg) translateY(-2px); } }
+@keyframes e-shine { 0%, 38% { transform: translateX(0) rotate(20deg); } 72%, 100% { transform: translateX(150px) rotate(20deg); } }
+
+/* работа: плюс подпрыгивает */
+.pp-plus { animation: e-plus 3s cubic-bezier(.3,1.5,.5,1) infinite; }
+@keyframes e-plus { 0%, 44% { transform: none; } 54% { transform: scale(1.35) rotate(90deg); } 64%, 100% { transform: rotate(90deg); } }
+
+/* деньги на карту: монета падает на место, рядом всплывает плюс */
+.nc-coin { animation: e-drop 3s cubic-bezier(.5,0,.4,1) infinite; }
+.nc-plus { animation: e-pop 3s cubic-bezier(.3,1.6,.5,1) infinite; }
+@keyframes e-drop { 0%, 40% { transform: none; opacity: 1; } 46% { transform: translateY(-46px); opacity: 0; } 47% { transform: translateY(-46px); opacity: 0; } 60% { transform: none; opacity: 1; } 65% { transform: translateY(-5px); } 70%, 100% { transform: none; } }
+@keyframes e-pop { 0%, 58% { transform: scale(1); } 60% { transform: scale(.2); } 70% { transform: scale(1.3); } 78%, 100% { transform: scale(1); } }
+
+/* процент: стрелка подскакивает вверх */
+.st-up { animation: e-jump 3s ease-in-out infinite; }
+@keyframes e-jump { 0%, 48% { transform: none; } 56% { transform: translateY(-9px); } 64% { transform: none; } 70% { transform: translateY(-4px); } 76%, 100% { transform: none; } }

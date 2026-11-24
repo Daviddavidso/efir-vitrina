@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /panel.html
+Disallow: /api.php
+Disallow: /check.php
